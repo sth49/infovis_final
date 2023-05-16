@@ -16,8 +16,10 @@
     <script src="components/scatterplot.js"></script>
     <script src="components/histogram.js"></script>
     <script src="components/datatable.js"></script>
+    <script src="components/dataloader.js"></script>
+    <script src="components/lineChart.js"></script>
 
-    <title>My Scatterplot</title>
+    <title>BOHB Experiment Result</title>
     <style>
       body {
         background: #eee;
@@ -25,8 +27,9 @@
       }
 
       .container {
-        width: 800px;
+        width: 1500px;
         background: white;
+        overflow-x:auto;
       }
 
       /* In the <style> tag in index.html */
@@ -42,133 +45,35 @@
     <header>
       <nav class="container navbar navbar-light bg-light">
         <div class="container-fluid">
-          <span class="navbar-brand mb-0 h1">My Scatterplot</span>
+          <span class="navbar-brand mb-0 h1">BOHB Experiment</span>
         </div>
       </nav>
     </header>
-
     <main class="container pb-3">
-      <div class="row pt-2">
-        <div class="col-1 text-end pe-2"><strong>X:</strong></div>
-        <div class="col-11">
-          <div class="form-check form-check-inline">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="x-encoding"
-              value="sepal.length"
-              id="x-sl"
-              checked
-            />
-            <label class="form-check-label" for="x-sl">SepalLength</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="x-encoding"
-              value="sepal.width"
-              id="x-sw"
-            />
-            <label class="form-check-label" for="x-sw">SepalWidth</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="x-encoding"
-              value="petal.length"
-              id="x-pl"
-            />
-            <label class="form-check-label" for="x-pl">PetalLength</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="x-encoding"
-              value="petal.width"
-              id="x-pw"
-            />
-            <label class="form-check-label" for="x-pw">PetalWidth</label>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-1 text-end pe-2"><strong>Y:</strong></div>
-        <div class="col-11">
-          <div class="form-check form-check-inline">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="y-encoding"
-              value="sepal.length"
-              id="y-sl"
-            />
-            <label class="form-check-label" for="y-sl">SepalLength</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="y-encoding"
-              value="sepal.width"
-              id="y-sw"
-              checked
-            />
-            <label class="form-check-label" for="y-sw">SepalWidth</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="y-encoding"
-              value="petal.length"
-              id="y-pl"
-            />
-            <label class="form-check-label" for="y-pl">PetalLength</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="y-encoding"
-              value="petal.width"
-              id="y-pw"
-            />
-            <label class="form-check-label" for="y-pw">PetalWidth</label>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col offset-1">
-          <div class="form-check form-switch">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              role="switch"
-              id="use-color"
-              checked
-            />
-            <label class="form-check-label" for="use-color"
-              >Color-encode Class</label
-            >
           </div>
         </div>
       </div>
       <div class="text-center">
+        <svg width="400" height="400" id="linechart"></svg>
         <svg width="400" height="400" id="scatterplot"></svg>
-
-        <svg width="400" height="400" id="histogram"></svg>
+        <!-- <svg width="400" height="400" id="histogram"></svg> -->
       </div>
-      <table class="table table-striped text-center">
+      <table class="table table-striped text-center" style="overflow-x:auto;">
         <thead>
           <tr>
-            <th>Petal Length</th>
-            <th>Petal Width</th>
-            <th>Sepal Length</th>
-            <th>Sepal Width</th>
-            <th>Variety</th>
+            <th>Sample Id</th>
+            <th>Budget</th>
+            <th>Sample type</th>
+            <th>Batch size</th>
+            <th>Optimizer</th>
+            <th>Momentum</th>
+            <th>Hidden size</th>
+            <th>Scehduler</th>
+            <th>Learning rate</th>
+            <th>Activation</th>
+            <th>Weight Decay</th>
+            <th>Loss</th>
+            <th>Accuracy</th>
           </tr>
         </thead>
         <tbody id="data-table"></tbody>
@@ -176,51 +81,93 @@
     </main>
 
     <script>
-      let data, brushedData, scatterplot, histogram, dataTable;
+      let data, scatterplot, histogram, dataTable;
+      let linechart;
+      let selected = null;
+      let brushedData = null;
 
       function updateScatterplot() {
-        let xVar = d3
-          .select("input[type=radio][name=x-encoding]:checked")
-          .property("value");
-        let yVar = d3
-          .select("input[type=radio][name=y-encoding]:checked")
-          .property("value");
-        let useColor = d3.select("#use-color").property("checked");
-
-        // TODO: update the scatterplot by calling scatterplot.update
-        scatterplot.update(xVar, yVar, "variety", useColor);
-      }
-
-      function updateHistogram() {
-        histogram.update(
-          brushedData && brushedData.length > 0 ? brushedData : data,
-          "variety"
+        // let useColor = d3.select("#use-color").property("checked");
+        scatterplot.update(
+          selected === null ? data.data : data.brackets[selected]
         );
       }
+      function updateLineChart() {
+        linechart.update();
+      }
 
-      function updateDataTable() {
-        dataTable.update(
-          brushedData && brushedData.length > 0 ? brushedData : data,
-          data.columns
-        );
+      // function updateHistogram() {
+      //   histogram.update(
+      //     brushedData && brushedData.length > 0 ? brushedData : data,
+      //     "variety"
+      //   );
+      // }
+
+      function updateDataTable(updateType = "all") {
+        console.log("updateDataTable", selected);
+        console.log(data.bracket)
+        console.log(data.brackets[selected]);
+        let data2;
+        if (updateType === "all") {
+          data2 = data.data;
+        }
+        if (updateType === "brush") {
+          data2 = brushedData && brushedData.length > 0 ? brushedData : selected === null ? data.data : data.brackets[selected];
+        }
+        if (updateType === "linechart") {
+          data2 = data.brackets[selected]? data.brackets[selected] : data.data;
+        }
+        dataTable.update(data2);
       }
 
       d3.csv(
-        "https://gist.githubusercontent.com/netj/8836201/raw/6f9306ad21398ea43cba4f7d537619d0e07d5ae3/iris.csv"
+        "https://docs.google.com/spreadsheets/d/e/2PACX-1vQBFaIz7UtP909w7G_3q39Sf4qt0jA43ITVpq5k4fj6XXcMb33iVsNBmtCcZKFR0tlkNTAmj-PxYvIW/pub?gid=1850991007&single=true&output=csv"
       ).then((csvData) => {
         csvData.forEach((d) => {
-          d["petal.length"] = +d["petal.length"];
-          d["petal.width"] = +d["petal.width"];
-          d["sepal.length"] = +d["sepal.length"];
-          d["sepal.width"] = +d["sepal.width"];
+          d["id"] = d["bracket"] + "-" + d["round"] + "-" + d["trial"];
+          d["bracket"] = +d["bracket"];
+          d["round"] = +d["round"];
+          d["trial"] = +d["trial"];
+          d["budget"] = +d["budget"];
+          d["config_batch_size"] = +d["config_batch_size"];
+          d["config_momentum"] = +d["config_momentum"];
+          d["config_hidden_size"] = +d["config_hidden_size"];
+          d["config_lerning_rate"] = +d["config_lerning_rate"];
+          d["config_weight_decay"] = +d["config_weight_decay"];
+          d["sample_loss"] = +d["sample_loss"];
+          d["sample_acc"] = +d["sample_acc"];
         });
+        data = new DataLoader(csvData);
 
-        data = csvData;
-
-        scatterplot = new Scatterplot("#scatterplot", data);
+        // console.log(data.bracket_0);
+        scatterplot = new Scatterplot("#scatterplot");
         scatterplot.initialize();
 
+        linechart = new LineChart("#linechart", data);
+        linechart.initialize();
+        updateLineChart();
+        linechart.on("clicked", (dtype) => {
+          selected = dtype;
+          updateDataTable("linechart");
+          updateScatterplot();
+        });
+
         updateScatterplot();
+        scatterplot.on("brush", (brushedItems) => {
+          console.log("binding");
+          console.log(brushedItems);
+          brushedData = brushedItems;
+          // brushedData = brushedItems;
+          // updateHistogram();
+          updateDataTable("brush");
+        });
+
+        // scatterplot.on("brushed", (d) => {
+        //   console.log("brushed");
+        //   brushedData = d ? d : null;
+        //   // updateHistogram();
+        //   updateDataTable();
+        // });
         d3.selectAll("input[type=radio][name=x-encoding]").on(
           "change",
           updateScatterplot
@@ -231,18 +178,7 @@
         );
         d3.selectAll("#use-color").on("change", updateScatterplot);
 
-        // TODO: bind an event handler to "brush" events
-        scatterplot.on("brush", (brushedItems) => {
-          brushedData = brushedItems;
-          updateHistogram();
-          updateDataTable();
-        });
-        histogram = new Histogram("#histogram");
-        histogram.initialize();
-
-        updateHistogram();
-
-        dataTable = new DataTable("#data-table");
+        dataTable = new DataTable("#data-table", data.data.columns);
 
         updateDataTable();
       });
