@@ -15,10 +15,10 @@ class DataTable {
     // console.log(columns);
     // columns = columns || Object.keys(data[0]);
     data.sort((b, a) => a["sample_acc"] - b["sample_acc"]);
-    console.log(this.columns);
+    // console.log(this.columns);
     let table = d3.select(this.id);
     let rows = table.selectAll("tr").data(data).join("tr");
-    console.log("data", data);
+    // console.log("data", data);
     rows
       .selectAll("td")
       .data((d) => this.columns.map((c) => d[c]))

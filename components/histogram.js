@@ -37,6 +37,7 @@ class Histogram {
     // 선택된 애들만 업데이트
     let xVar = "sample_type";
     const categories = [...new Set(data.map((d) => d[xVar]))];
+    categories.sort();
     const counts = {};
     const zData = [];
     categories.forEach((c) => {
@@ -61,6 +62,7 @@ class Histogram {
       .selectAll("rect")
       .data(categories)
       .join("rect")
+      .transition()
       .attr("x", (d) => this.xScale(d))
       .attr("y", (d) => this.yScale(counts[d]))
       .attr("width", this.xScale.bandwidth())
