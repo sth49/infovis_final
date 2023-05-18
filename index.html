@@ -18,6 +18,7 @@
     <script src="components/datatable.js"></script>
     <script src="components/dataloader.js"></script>
     <script src="components/lineChart.js"></script>
+    <script src="components/tsnescatterplot.js"></script>
 
     <title>BOHB Experiment Result</title>
     <style>
@@ -38,6 +39,7 @@
         stroke: gray;
         r: 5;
       }
+
     </style>
   </head>
 
@@ -56,6 +58,7 @@
       <div class="text-center">
         <svg width="400" height="400" id="linechart"></svg>
         <svg width="400" height="400" id="scatterplot"></svg>
+        <svg width="400" height="400" id="tsne"></svg>
         <!-- <svg width="400" height="400" id="histogram"></svg> -->
       </div>
       <table class="table table-striped text-center" style="overflow-x:auto;">
@@ -81,11 +84,17 @@
     </main>
 
     <script>
-      let data, scatterplot, histogram, dataTable;
+      let data, tsnescatterplot, histogram, dataTable, scatterplot;
       let linechart;
       let selected = null;
       let brushedData = null;
 
+      function updateTsneScatterplot() {
+        // let useColor = d3.select("#use-color").property("checked");
+        tsnescatterplot.update(
+          selected === null ? data.data : data.brackets[selected]
+        );
+      }
       function updateScatterplot() {
         // let useColor = d3.select("#use-color").property("checked");
         scatterplot.update(
@@ -136,30 +145,38 @@
           d["config_weight_decay"] = +d["config_weight_decay"];
           d["sample_loss"] = +d["sample_loss"];
           d["sample_acc"] = +d["sample_acc"];
+          d["x"] = +d["x"];
+          d["y"] = +d["y"];
         });
         data = new DataLoader(csvData);
 
-        // console.log(data.bracket_0);
         scatterplot = new Scatterplot("#scatterplot");
         scatterplot.initialize();
+
+        tsnescatterplot = new TsneScatterplot("#tsne");
+        tsnescatterplot.initialize();
+
 
         linechart = new LineChart("#linechart", data);
         linechart.initialize();
         updateLineChart();
         linechart.on("clicked", (dtype) => {
           selected = dtype;
-          updateDataTable("linechart");
           updateScatterplot();
+          updateTsneScatterplot();
+          updateDataTable("linechart");
         });
 
+        updateTsneScatterplot();
         updateScatterplot();
-        scatterplot.on("brush", (brushedItems) => {
-          console.log("binding");
-          console.log(brushedItems);
+        tsnescatterplot.on("brush", (brushedItems) => {
+          // console.log("binding");
+          // console.log(brushedItems);
           brushedData = brushedItems;
           // brushedData = brushedItems;
           // updateHistogram();
           updateDataTable("brush");
+          // scatterplot.update(brushedItems);
         });
 
         // scatterplot.on("brushed", (d) => {
@@ -168,15 +185,15 @@
         //   // updateHistogram();
         //   updateDataTable();
         // });
-        d3.selectAll("input[type=radio][name=x-encoding]").on(
-          "change",
-          updateScatterplot
-        );
-        d3.selectAll("input[type=radio][name=y-encoding]").on(
-          "change",
-          updateScatterplot
-        );
-        d3.selectAll("#use-color").on("change", updateScatterplot);
+        // d3.selectAll("input[type=radio][name=x-encoding]").on(
+        //   "change",
+        //   updateTsneScatterplot
+        // );
+        // d3.selectAll("input[type=radio][name=y-encoding]").on(
+        //   "change",
+        //   updateTsneScatterplot
+        // );
+        // d3.selectAll("#use-color").on("change", updateTsneScatterplot);
 
         dataTable = new DataTable("#data-table", data.data.columns);
 

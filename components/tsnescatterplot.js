@@ -1,4 +1,4 @@
-class Scatterplot {
+class TsneScatterplot {
   margin = {
     top: 50,
     right: 100,
@@ -23,46 +23,49 @@ class Scatterplot {
 
     this.xScale = d3.scaleLinear();
     this.yScale = d3.scaleLinear();
-    this.zScale = d3.scaleOrdinal().range(d3.schemeCategory10);
+    // this.zScale = d3.scaleOrdinal().range(d3.schemeCategory10);
+    this.zScale = d3.scaleSequential(d3.interpolateGreens).domain([0, 1]);
 
     this.svg
       .attr("width", this.width + this.margin.left + this.margin.right)
-      .attr("height", this.height + this.margin.top + this.margin.bottom);
+      .attr("height", this.height + this.margin.top + this.margin.bottom)
+      .append("rect")
+      .attr("x", 0)
+      .attr("y", 0)
+      .attr("width", this.width + this.margin.left + this.margin.right)
+      .attr("height", this.height + this.margin.top + this.margin.bottom)
+      .style("fill", "none") // 채우기 없음
+      .style("stroke", "gray");
 
     this.container.attr(
       "transform",
       `translate(${this.margin.left}, ${this.margin.top})`
     );
-    // this.brush = d3
-    //   .brush()
-    //   .extent([
-    //     [0, 0],
-    //     [this.width, this.height],
-    //   ])
-    //   .on("start brush", (event) => {
-    //     this.brushCircles(event);
-    //   });
+    this.brush = d3
+      .brush()
+      .extent([
+        [0, 0],
+        [this.width, this.height],
+      ])
+      .on("start brush", (event) => {
+        this.brushCircles(event);
+      });
   }
 
   update(data) {
     this.data = data;
-    this.xVar = "sample_loss";
-    this.yVar = "sample_acc";
-    this.colorVar = "round";
-    data = data.map((d) => {
-      return {
-        ...d,
-        [this.xVar]: Math.min(d[this.xVar], 3),
-      };
-    });
+    this.xVar = "x";
+    this.yVar = "y";
+    this.colorVar = "sample_acc";
+
     this.xScale
       .domain(d3.extent(data, (d) => d[this.xVar]))
       .range([0, this.width]);
     this.yScale
       .domain(d3.extent(data, (d) => d[this.yVar]))
       .range([this.height, 0]);
-    let zDomain = [...new Set(data.map((d) => d[this.colorVar]))];
-    this.zScale.domain(zDomain.sort((a, b) => a - b));
+    // let zDomain = [...new Set(data.map((d) => d[this.colorVar]))];
+    // this.zScale.domain(zDomain.sort((a, b) => a - b));
     console.log("update scatterplot:", data);
 
     this.circles = this.container.selectAll("circle").data(data).join("circle");
@@ -74,22 +77,7 @@ class Scatterplot {
       .attr("fill", (d) => this.zScale(d[this.colorVar]))
       .attr("r", 3);
 
-    // this.container.call(this.brush);
-
-    this.xAxis
-      .attr(
-        "transform",
-        `translate(${this.margin.left}, ${this.margin.top + this.height})`
-      )
-      .transition()
-      .call(d3.axisBottom(this.xScale));
-
-    this.yAxis
-      .attr("transform", `translate(${this.margin.left}, ${this.margin.top})`)
-      .transition()
-      .call(d3.axisLeft(this.yScale));
-    // let useColor = true;
-    // if (useColor) {
+    this.container.call(this.brush);
     this.legend
       .style("display", "inline")
       .style("font-size", ".8em")
@@ -102,13 +90,13 @@ class Scatterplot {
     //   this.legend.style("display", "none");
     // }
   }
-  // isBrushed(d, selection) {
-  //   // destructuring assignment
-  //   let [[x0, y0], [x1, y1]] = selection;
-  //   let x = this.xScale(d[this.xVar]);
-  //   let y = this.yScale(d[this.yVar]);
-  //   return x0 <= x && x <= x1 && y0 <= y && y <= y1;
-  // }
+  isBrushed(d, selection) {
+    // destructuring assignment
+    let [[x0, y0], [x1, y1]] = selection;
+    let x = this.xScale(d[this.xVar]);
+    let y = this.yScale(d[this.yVar]);
+    return x0 <= x && x <= x1 && y0 <= y && y <= y1;
+  }
 
   // isBrushed(d, selection) {
   //   let [[x0, y0], [x1, y1]] = selection; // destructuring assignment
@@ -117,18 +105,18 @@ class Scatterplot {
   // }
 
   // this method will be called each time the brush is updated.
-  // brushCircles(event) {
-  //   let selection = event.selection;
-  //   console.log("brushed2");
-  //   this.circles.classed("brushed", (d) => this.isBrushed(d, selection));
-  //   // let data = this.circles;
-  //   if (this.handlers.brush)
-  //     this.handlers.brush(
-  //       this.data.filter((d) => this.isBrushed(d, selection))
-  //     );
-  // }
+  brushCircles(event) {
+    let selection = event.selection;
+    console.log("brushed2");
+    this.circles.classed("brushed", (d) => this.isBrushed(d, selection));
+    // let data = this.circles;
+    if (this.handlers.brush)
+      this.handlers.brush(
+        this.data.filter((d) => this.isBrushed(d, selection))
+      );
+  }
 
-  // on(eventType, handler) {
-  //   this.handlers[eventType] = handler;
-  // }
+  on(eventType, handler) {
+    this.handlers[eventType] = handler;
+  }
 }
