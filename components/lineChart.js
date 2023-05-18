@@ -3,7 +3,7 @@ class LineChart {
     top: 30,
     right: 100,
     bottom: 40,
-    left: 40,
+    left: 50,
   };
   // 생성자
   constructor(svg, dataloader, width = 400, height = 350) {
@@ -19,6 +19,7 @@ class LineChart {
   // 초기화
   initialize() {
     this.svg = d3.select(this.svg);
+    this.legend = this.svg.append("g");
     this.svg
       .attr("width", this.width + this.margin.left + this.margin.right + 20)
       .attr("height", this.height + this.margin.top + this.margin.bottom);
@@ -47,15 +48,7 @@ class LineChart {
       .attr("x", -this.height / 2 + this.margin.top)
       .text("Avg. Accuracy");
     // 범례
-    this.legend = this.svg.append("g");
-    this.legend
-      .style("display", "inline")
-      .style("font-size", ".8em")
-      .attr(
-        "transform",
-        `translate(${this.width + this.margin.left + 10}, ${this.height / 2})`
-      )
-      .call(d3.legendColor().scale(this.zScale));
+
     // 매핑할 변수
     this.xVar = "round";
     this.yVar = "avg_acc";
@@ -65,9 +58,10 @@ class LineChart {
     this.yScale
       .domain(d3.extent(this.dataloader.linechart, (d) => d[this.yVar]))
       .range([this.height, 0]);
-    this.zScale.domain([
+    let zDomain = [
       ...new Set(this.dataloader.linechart.map((d) => d[this.colorVar])),
-    ]);
+    ];
+    this.zScale.domain(zDomain.sort((a, b) => a - b));
     // 점 그리기
     this.circles = this.container
       .selectAll("circle")
@@ -185,10 +179,17 @@ class LineChart {
         this.handlers.clicked(this.selectedLine.key);
       }
     });
+    this.legend
+      .style("display", "inline")
+      .style("font-size", ".8em")
+      .attr(
+        "transform",
+        `translate(${this.width + this.margin.left + 10}, ${this.height / 2})`
+      )
+      .call(d3.legendColor().scale(this.zScale));
   }
 
   on(event, handler) {
-    console.log(event);
     this.handlers[event] = handler;
   }
 }

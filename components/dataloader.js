@@ -1,12 +1,11 @@
 class DataLoader {
-  constructor(csvData) {
+  constructor(csvData, csvData2) {
     this.data = csvData;
-    console.log(this.data);
+    this.corr = csvData2;
     this.brackets = [];
     for (let i = 5; i >= 0; i--) {
       this.brackets[i] = this.data.filter((d) => d["bracket"] == i);
     }
-    console.log(this.brackets);
     this.rounds = [];
     this.linechart = [];
     for (let j = 5; j >= 0; j--) {
@@ -20,6 +19,5 @@ class DataLoader {
         });
       }
     }
-    console.log(this.linechart);
   }
 }

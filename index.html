@@ -19,6 +19,7 @@
     <script src="components/dataloader.js"></script>
     <script src="components/lineChart.js"></script>
     <script src="components/tsnescatterplot.js"></script>
+    <script src="components/heatmap.js"></script>
 
     <title>BOHB Experiment Result</title>
     <style>
@@ -57,8 +58,12 @@
       </div>
       <div class="text-center">
         <svg width="400" height="400" id="linechart"></svg>
+        <svg width="400" height="400" id="heatmap"></svg>
         <svg width="400" height="400" id="scatterplot"></svg>
         <svg width="400" height="400" id="tsne"></svg>
+        <svg width="400" height="400" id="histogram"></svg>
+        
+        
         <!-- <svg width="400" height="400" id="histogram"></svg> -->
       </div>
       <table class="table table-striped text-center" style="overflow-x:auto;">
@@ -85,6 +90,7 @@
 
     <script>
       let data, tsnescatterplot, histogram, dataTable, scatterplot;
+      let heatmap;
       let linechart;
       let selected = null;
       let brushedData = null;
@@ -105,17 +111,25 @@
         linechart.update();
       }
 
-      // function updateHistogram() {
-      //   histogram.update(
-      //     brushedData && brushedData.length > 0 ? brushedData : data,
-      //     "variety"
-      //   );
-      // }
+      function updateHistogram(updateType = "all") {
+        let data2;
+        if (updateType === "all") {
+          data2 = data.data;
+        }
+        if (updateType === "brush") {
+          data2 = brushedData && brushedData.length > 0 ? brushedData : selected === null ? data.data : data.brackets[selected];
+        }
+        if (updateType === "linechart") {
+          data2 = data.brackets[selected]? data.brackets[selected] : data.data;
+        }
+
+        histogram.update(
+          data2
+      
+        );
+      }
 
       function updateDataTable(updateType = "all") {
-        console.log("updateDataTable", selected);
-        console.log(data.bracket)
-        console.log(data.brackets[selected]);
         let data2;
         if (updateType === "all") {
           data2 = data.data;
@@ -148,7 +162,12 @@
           d["x"] = +d["x"];
           d["y"] = +d["y"];
         });
-        data = new DataLoader(csvData);
+        d3.csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vS3LGYQ8M_0AyQT_6jo6-c-A5x7lQ-D7tTwZqGNIXXxEg1oixoAxFKNI5Yrk4ZyIJcZP2lPoZf-JTw8/pub?gid=0&single=true&output=csv").then(
+          (csvData2) => {
+            csvData2.forEach((d) =>{
+          d["value"] = +d["value"];
+            });
+            data = new DataLoader(csvData, csvData2);
 
         scatterplot = new Scatterplot("#scatterplot");
         scatterplot.initialize();
@@ -156,19 +175,25 @@
         tsnescatterplot = new TsneScatterplot("#tsne");
         tsnescatterplot.initialize();
 
-
+        heatmap = new Heatmap("#heatmap", data.corr);
+        heatmap.initialize();
         linechart = new LineChart("#linechart", data);
         linechart.initialize();
+        histogram = new Histogram("#histogram");
+        histogram.initialize();
+        
         updateLineChart();
         linechart.on("clicked", (dtype) => {
           selected = dtype;
           updateScatterplot();
           updateTsneScatterplot();
+          updateHistogram("linechart");
           updateDataTable("linechart");
         });
 
         updateTsneScatterplot();
         updateScatterplot();
+        updateHistogram();
         tsnescatterplot.on("brush", (brushedItems) => {
           // console.log("binding");
           // console.log(brushedItems);
@@ -176,6 +201,7 @@
           // brushedData = brushedItems;
           // updateHistogram();
           updateDataTable("brush");
+          updateHistogram("brush");
           // scatterplot.update(brushedItems);
         });
 
@@ -198,6 +224,10 @@
         dataTable = new DataTable("#data-table", data.data.columns);
 
         updateDataTable();
+          }
+        )
+
+        
       });
     </script>
 

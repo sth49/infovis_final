@@ -8,7 +8,6 @@ class TsneScatterplot {
 
   constructor(svg, width = 250, height = 250) {
     this.svg = svg;
-    // this.data = data;
     this.width = width;
     this.height = height;
     this.handlers = {};
@@ -23,7 +22,6 @@ class TsneScatterplot {
 
     this.xScale = d3.scaleLinear();
     this.yScale = d3.scaleLinear();
-    // this.zScale = d3.scaleOrdinal().range(d3.schemeCategory10);
     this.zScale = d3.scaleSequential(d3.interpolateGreens).domain([0, 1]);
 
     this.svg
@@ -34,7 +32,7 @@ class TsneScatterplot {
       .attr("y", 0)
       .attr("width", this.width + this.margin.left + this.margin.right)
       .attr("height", this.height + this.margin.top + this.margin.bottom)
-      .style("fill", "none") // 채우기 없음
+      .style("fill", "none")
       .style("stroke", "gray");
 
     this.container.attr(
@@ -64,9 +62,6 @@ class TsneScatterplot {
     this.yScale
       .domain(d3.extent(data, (d) => d[this.yVar]))
       .range([this.height, 0]);
-    // let zDomain = [...new Set(data.map((d) => d[this.colorVar]))];
-    // this.zScale.domain(zDomain.sort((a, b) => a - b));
-    console.log("update scatterplot:", data);
 
     this.circles = this.container.selectAll("circle").data(data).join("circle");
 
@@ -86,30 +81,17 @@ class TsneScatterplot {
         `translate(${this.width + this.margin.left + 10}, ${this.height / 2})`
       )
       .call(d3.legendColor().scale(this.zScale));
-    // } else {
-    //   this.legend.style("display", "none");
-    // }
   }
   isBrushed(d, selection) {
-    // destructuring assignment
     let [[x0, y0], [x1, y1]] = selection;
     let x = this.xScale(d[this.xVar]);
     let y = this.yScale(d[this.yVar]);
     return x0 <= x && x <= x1 && y0 <= y && y <= y1;
   }
 
-  // isBrushed(d, selection) {
-  //   let [[x0, y0], [x1, y1]] = selection; // destructuring assignment
-
-  //   // TODO: return true if d's coordinate is inside the selection
-  // }
-
-  // this method will be called each time the brush is updated.
   brushCircles(event) {
     let selection = event.selection;
-    console.log("brushed2");
     this.circles.classed("brushed", (d) => this.isBrushed(d, selection));
-    // let data = this.circles;
     if (this.handlers.brush)
       this.handlers.brush(
         this.data.filter((d) => this.isBrushed(d, selection))

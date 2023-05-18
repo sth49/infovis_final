@@ -5,7 +5,9 @@ class DataTable {
     columns = columns
       .filter((d) => d != "bracket")
       .filter((d) => d != "round")
-      .filter((d) => d != "trial");
+      .filter((d) => d != "trial")
+      .filter((d) => d != "x")
+      .filter((d) => d != "y");
     this.columns = columns;
     this.columns.unshift("id");
   }
