@@ -1,3 +1,4 @@
+// # 코드 출처: https://github.com/e-/d3-examples
 class Histogram {
   margin = {
     top: 10,
