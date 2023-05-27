@@ -36,7 +36,7 @@ class LineChart {
     // x축 y축 레이블
   }
   update(dataType) {
-    let text = "Avg. Accuracy";
+    let text = "Average Accuracy";
     if (dataType === "linechart") {
       this.data = this.dataloader.linechart;
     } else if (dataType === "linechart2") {

@@ -25,8 +25,21 @@ class Scatterplot {
     this.zScale = d3.scaleOrdinal().range(d3.schemeCategory10);
 
     this.svg
-      .attr("width", this.width + this.margin.left + this.margin.right)
-      .attr("height", this.height + this.margin.top + this.margin.bottom);
+      .attr("width", this.width + this.margin.left + this.margin.right + 20)
+      .attr("height", this.height + this.margin.top + this.margin.bottom)
+      .append("text")
+      .attr("text-anchor", "end")
+      .attr("x", this.width / 2 + this.margin.left + 30)
+      .attr("y", this.height + this.margin.top + 40)
+      .text("Loss");
+    this.svg
+      .append("text")
+      .attr("class", "y-axis-label") // Add a class to the Y-axis label
+      .attr("text-anchor", "end")
+      .attr("transform", "rotate(-90)")
+      .attr("y", this.margin.left - 20)
+      .attr("x", -this.height / 2 + this.margin.top - 60)
+      .text("Accuracy");
 
     this.container.attr(
       "transform",
@@ -47,7 +60,7 @@ class Scatterplot {
     });
     this.xScale
       .domain(d3.extent(data, (d) => d[this.xVar]))
-      .range([0, this.width]);
+      .range([20, this.width]);
     this.yScale
       .domain(d3.extent(data, (d) => d[this.yVar]))
       .range([this.height, 0]);
@@ -72,7 +85,10 @@ class Scatterplot {
       .call(d3.axisBottom(this.xScale));
 
     this.yAxis
-      .attr("transform", `translate(${this.margin.left}, ${this.margin.top})`)
+      .attr(
+        "transform",
+        `translate(${this.margin.left + 20}, ${this.margin.top})`
+      )
       .transition()
       .call(d3.axisLeft(this.yScale));
     this.legend
