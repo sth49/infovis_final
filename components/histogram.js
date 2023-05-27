@@ -50,14 +50,12 @@ class Histogram {
         });
       zData.push(sum / counts[c]);
     });
-    // zData.push(data.filter((d) => d['sample_type']== 'BO'))
 
     this.xScale.domain(categories).range([0, this.width]).padding(0.3);
     this.yScale
       .domain([0, d3.max(Object.values(counts))])
       .range([this.height, 0]);
 
-    // TODO: draw a histogram
     this.container
       .selectAll("rect")
       .data(categories)
@@ -88,7 +86,7 @@ class Histogram {
       .style("border-width", "2px")
       .style("border-radius", "5px")
       .style("padding", "5px")
-      .style("position", "absolute"); // position이 absolute가 되어야 합니다.
+      .style("position", "absolute");
 
     const mouseover = function (event, d) {
       tooltip.style("opacity", 1);

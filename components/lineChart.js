@@ -63,13 +63,7 @@ class LineChart {
       .attr("x", this.width / 2 + this.margin.left + 30)
       .attr("y", this.height + this.margin.top + 40)
       .text("Round");
-    // this.svg
-    //   .append("text")
-    //   .attr("text-anchor", "end")
-    //   .attr("transform", "rotate(-90)")
-    //   .attr("y", this.margin.left - 20)
-    //   .attr("x", -this.height / 2 + this.margin.top)
-    //   .text(text);
+
     // 범례
 
     // 매핑할 변수

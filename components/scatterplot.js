@@ -8,7 +8,6 @@ class Scatterplot {
 
   constructor(svg, width = 250, height = 250) {
     this.svg = svg;
-    // this.data = data;
     this.width = width;
     this.height = height;
     this.handlers = {};

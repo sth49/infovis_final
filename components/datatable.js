@@ -11,24 +11,6 @@ class DataTable {
     this.columns = columns;
     this.columns.unshift("id");
   }
-  // update(data, sortingType) {
-  //   console.log("sortingType", sortingType);
-  //   console.log(data);
-  //   if (sortingType === "sample_id") {
-  //     data.sort((a, b) => a[sortingType].localeCompare(b[sortingType]));
-  //   } else if (sortingType !== "sample_id") {
-  //     data.sort((b, a) => a[sortingType] - b[sortingType]);
-  //   }
-
-  //   let table = d3.select(this.id);
-  //   let rows = table.selectAll("tr").data(data).join("tr");
-  //   // console.log("data", data);
-  //   rows
-  //     .selectAll("td")
-  //     .data((d) => this.columns.map((c) => d[c]))
-  //     .join("td")
-  //     .text((d) => d);
-  // }
   update(data, sortingType) {
     console.log("sortingType", sortingType);
     console.log(data);
@@ -53,7 +35,6 @@ class DataTable {
 
     let table = d3.select(this.id);
     let rows = table.selectAll("tr").data(data).join("tr");
-    // console.log("data", data);
     rows
       .selectAll("td")
       .data((d) => this.columns.map((c) => d[c]))
