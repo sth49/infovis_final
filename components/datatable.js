@@ -11,11 +11,46 @@ class DataTable {
     this.columns = columns;
     this.columns.unshift("id");
   }
-  update(data) {
-    // console.log(columns);
-    // columns = columns || Object.keys(data[0]);
-    data.sort((b, a) => a["sample_acc"] - b["sample_acc"]);
-    // console.log(this.columns);
+  // update(data, sortingType) {
+  //   console.log("sortingType", sortingType);
+  //   console.log(data);
+  //   if (sortingType === "sample_id") {
+  //     data.sort((a, b) => a[sortingType].localeCompare(b[sortingType]));
+  //   } else if (sortingType !== "sample_id") {
+  //     data.sort((b, a) => a[sortingType] - b[sortingType]);
+  //   }
+
+  //   let table = d3.select(this.id);
+  //   let rows = table.selectAll("tr").data(data).join("tr");
+  //   // console.log("data", data);
+  //   rows
+  //     .selectAll("td")
+  //     .data((d) => this.columns.map((c) => d[c]))
+  //     .join("td")
+  //     .text((d) => d);
+  // }
+  update(data, sortingType) {
+    console.log("sortingType", sortingType);
+    console.log(data);
+    if (sortingType === "sample_id") {
+      data.sort((a, b) => {
+        let comparison = a["bracket"] - b["bracket"];
+
+        if (comparison === 0) {
+          comparison = a["round"] - b["round"];
+        }
+
+        if (comparison === 0) {
+          comparison = a["trial"] - b["trial"];
+        }
+        return comparison;
+      });
+    } else if (typeof data[0][sortingType] === "string") {
+      data.sort((a, b) => a[sortingType].localeCompare(b[sortingType]));
+    } else {
+      data.sort((b, a) => a[sortingType] - b[sortingType]);
+    }
+
     let table = d3.select(this.id);
     let rows = table.selectAll("tr").data(data).join("tr");
     // console.log("data", data);

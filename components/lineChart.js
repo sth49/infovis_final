@@ -34,19 +34,42 @@ class LineChart {
     this.yScale = d3.scaleLinear(); // 평균 accuracy
     this.zScale = d3.scaleOrdinal().range(d3.schemeCategory10); // bracket
     // x축 y축 레이블
+  }
+  update(dataType) {
+    let text = "Avg. Accuracy";
+    if (dataType === "linechart") {
+      this.data = this.dataloader.linechart;
+    } else if (dataType === "linechart2") {
+      this.data = this.dataloader.linechart2;
+      text = "Best Accuracy";
+    }
+    // Check if Y-axis label already exists
+    const yAxisLabel = this.svg.select(".y-axis-label");
+    if (yAxisLabel.empty()) {
+      this.svg
+        .append("text")
+        .attr("class", "y-axis-label") // Add a class to the Y-axis label
+        .attr("text-anchor", "end")
+        .attr("transform", "rotate(-90)")
+        .attr("y", this.margin.left - 20)
+        .attr("x", -this.height / 2 + this.margin.top)
+        .text(text);
+    } else {
+      yAxisLabel.text(text); // Update the existing Y-axis label text
+    }
     this.svg
       .append("text")
       .attr("text-anchor", "end")
       .attr("x", this.width / 2 + this.margin.left + 30)
       .attr("y", this.height + this.margin.top + 40)
       .text("Round");
-    this.svg
-      .append("text")
-      .attr("text-anchor", "end")
-      .attr("transform", "rotate(-90)")
-      .attr("y", this.margin.left - 20)
-      .attr("x", -this.height / 2 + this.margin.top)
-      .text("Avg. Accuracy");
+    // this.svg
+    //   .append("text")
+    //   .attr("text-anchor", "end")
+    //   .attr("transform", "rotate(-90)")
+    //   .attr("y", this.margin.left - 20)
+    //   .attr("x", -this.height / 2 + this.margin.top)
+    //   .text(text);
     // 범례
 
     // 매핑할 변수
@@ -56,16 +79,14 @@ class LineChart {
     // x축 y축 color 범위 설정
     this.xScale.domain([-0.3, 0, 1, 2, 3, 4, 5]).range([20, this.width]);
     this.yScale
-      .domain(d3.extent(this.dataloader.linechart, (d) => d[this.yVar]))
+      .domain(d3.extent(this.data, (d) => d[this.yVar]))
       .range([this.height, 0]);
-    let zDomain = [
-      ...new Set(this.dataloader.linechart.map((d) => d[this.colorVar])),
-    ];
+    let zDomain = [...new Set(this.data.map((d) => d[this.colorVar]))];
     this.zScale.domain(zDomain.sort((a, b) => a - b));
     // 점 그리기
     this.circles = this.container
       .selectAll("circle")
-      .data(this.dataloader.linechart)
+      .data(this.data)
       .join("circle")
       .attr("cx", (d) => this.xScale(d[this.xVar]))
       .attr("cy", (d) => this.yScale(d[this.yVar]))
@@ -92,11 +113,10 @@ class LineChart {
       .x((d) => this.xScale(d[this.xVar]))
       .y((d) => this.yScale(d[this.yVar]));
     this.groups = Array.from(
-      d3.group(this.dataloader.linechart, (d) => d[this.colorVar]),
+      d3.group(this.data, (d) => d[this.colorVar]),
       ([key, value]) => ({ key, value })
     );
-  }
-  update() {
+
     // 라인 그리기
     this.container
       .selectAll("path.line")
