@@ -1,8 +1,8 @@
 // # 코드 출처: https://github.com/e-/d3-examples
 class Histogram {
   margin = {
-    top: 10,
-    right: 10,
+    top: 50,
+    right: 60,
     bottom: 40,
     left: 40,
   };
@@ -77,6 +77,7 @@ class Histogram {
     this.yAxis
       .attr("transform", `translate(${this.margin.left}, ${this.margin.top})`)
       .call(d3.axisLeft(this.yScale));
+
     const tooltip = d3
       .select("body")
       .append("div")
@@ -123,6 +124,13 @@ class Histogram {
         "transform",
         `translate(${this.width + this.margin.left + 10}, ${this.height / 2})`
       )
-      .call(d3.legendColor().scale(this.zScale));
+      .call(d3.legendColor().scale(this.zScale))
+      .append("text")
+      .text("Accuracy")
+      .attr("y", -15)
+      .attr("x", 20)
+      .attr("dy", "0.5em")
+      .style("text-anchor", "middle")
+      .style("font-size", "1em");
   }
 }

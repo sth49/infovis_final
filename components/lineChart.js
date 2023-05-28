@@ -200,7 +200,14 @@ class LineChart {
         "transform",
         `translate(${this.width + this.margin.left + 10}, ${this.height / 2})`
       )
-      .call(d3.legendColor().scale(this.zScale));
+      .call(d3.legendColor().scale(this.zScale))
+      .append("text")
+      .text("Bracket")
+      .attr("y", -15)
+      .attr("x", 20)
+      .attr("dy", "0.5em")
+      .style("text-anchor", "middle")
+      .style("font-size", "1em");
   }
 
   on(event, handler) {

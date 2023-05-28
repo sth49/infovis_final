@@ -2,7 +2,7 @@
 class Scatterplot {
   margin = {
     top: 50,
-    right: 100,
+    right: 80,
     bottom: 40,
     left: 40,
   };
@@ -26,7 +26,7 @@ class Scatterplot {
     this.zScale = d3.scaleOrdinal().range(d3.schemeCategory10);
 
     this.svg
-      .attr("width", this.width + this.margin.left + this.margin.right + 20)
+      .attr("width", this.width + this.margin.left + this.margin.right)
       .attr("height", this.height + this.margin.top + this.margin.bottom)
       .append("text")
       .attr("text-anchor", "end")
@@ -99,6 +99,13 @@ class Scatterplot {
         "transform",
         `translate(${this.width + this.margin.left + 10}, ${this.height / 2})`
       )
-      .call(d3.legendColor().scale(this.zScale));
+      .call(d3.legendColor().scale(this.zScale))
+      .append("text")
+      .text("Round")
+      .attr("y", -15)
+      .attr("x", 15)
+      .attr("dy", "0.5em")
+      .style("text-anchor", "middle")
+      .style("font-size", "1em");
   }
 }

@@ -96,7 +96,14 @@ class Heatmap {
         "transform",
         `translate(${this.width + this.margin.left + 10}, ${this.height / 2})`
       )
-      .call(d3.legendColor().scale(colorScale));
+      .call(d3.legendColor().scale(colorScale))
+      .append("text")
+      .text("Correlation")
+      .attr("y", -15)
+      .attr("x", 30)
+      .attr("dy", "0.5em")
+      .style("text-anchor", "middle")
+      .style("font-size", "1em");
     // tooltip 생성 부분을 initialize 밖으로 빼냅니다.
     const tooltip = d3
       .select("body")

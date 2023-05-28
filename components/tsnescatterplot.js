@@ -81,7 +81,14 @@ class TsneScatterplot {
         "transform",
         `translate(${this.width + this.margin.left + 10}, ${this.height / 2})`
       )
-      .call(d3.legendColor().scale(this.zScale));
+      .call(d3.legendColor().scale(this.zScale))
+      .append("text")
+      .text("Accuracy")
+      .attr("y", -15)
+      .attr("x", 20)
+      .attr("dy", "0.5em")
+      .style("text-anchor", "middle")
+      .style("font-size", "1em");
   }
   isBrushed(d, selection) {
     let [[x0, y0], [x1, y1]] = selection;
